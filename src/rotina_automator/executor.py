@@ -1,15 +1,13 @@
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
 from typing import Tuple
+
 from .planner import PlannedAction
 
 
 def run_plan(plan: list[PlannedAction], dry_run: bool) -> Tuple[int, list[str]]:
-    """
-    Retorna:
-      applied: quantas ações foram aplicadas (0 em dry-run)
-      errors: lista de erros ocorridos na execução
-    """
     errors: list[str] = []
 
     if not plan:
@@ -24,6 +22,18 @@ def run_plan(plan: list[PlannedAction], dry_run: bool) -> Tuple[int, list[str]]:
         print("\nNo changes applied (dry-run).")
         return 0, errors
 
-    # Amanhã a gente implementa execução de verdade
-    print("\nExecution not implemented yet (placeholder).")
-    return 0, errors
+    applied = 0
+    for item in plan:
+        try:
+            if item.type == "MOVE":
+                src = Path(item.src)
+                dst = Path(item.dst)
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(src), str(dst))
+                applied += 1
+            else:
+                errors.append(f"Unsupported action type: {item.type}")
+        except Exception as e:
+            errors.append(f"{item.type} failed: {item.src} -> {item.dst} ({e})")
+
+    return applied, errors
