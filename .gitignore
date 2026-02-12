@@ -9,3 +9,6 @@ build/
 *.egg-info/
 sandbox_in/
 sandbox_test/
+sandbox_in/
+sandbox_rename/
+sandbox_test/
